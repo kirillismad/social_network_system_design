@@ -1,0 +1,222 @@
+openapi: "3.0.3"
+info:
+  title: Travelers social network
+  description: API for travelers social network
+  contact:
+    name: Kirill Pech
+    email: pechkirill@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+  version: "1.0"
+servers:
+  - url: http://localhost:8000
+    description: Local server
+paths:
+  /sign-up:
+    post:
+      summary: Sign up
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignUpRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignUpResponse"
+  /sign-in:
+    post:
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignInRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignInResponse"
+  /sign-out:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Sign out
+      responses:
+        "200":
+          description: OK
+  # /users/{user_id}/posts:
+  #   get:
+  #     security:
+  #       - bearerAuth: []
+  #     summary: Get user posts
+  #     parameters:
+  #       - name: user_id
+  #         in: path
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: "#/components/schemas/CreatePostResponse"
+
+  # /users/{user_id}/posts/{post_id}:
+  #   get:
+  #     security:
+  #       - bearerAuth: []
+  #     summary: Get user post
+  #     parameters:
+  #       - name: user_id
+  #         in: path
+  #         required: true
+  #         schema:
+  #           type: string
+  #       - name: post_id
+  #         in: path
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/RetrievePostResponse"
+  #   delete:
+  # /locations:
+  #   get:
+  # /locations/with-post-count:
+  #   get:
+  # /locations/{location_id}/posts:
+  #   get:
+  # /images/upload:
+  #   post:
+  #     summary: Upload image
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         multipart/form-data:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               image:
+  #                 type: string
+  #                 format: binary
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 url:
+  #                   type: string
+  #               required:
+  #                 - url
+  # /users/{user_id}/posts/{post_id}/like:
+  #   post:
+  # /users/{user_id}/posts/{post_id}/dislike:
+  #   delete:
+  # /users/{user_id}/posts/{post_id}/comments:
+  #   get:
+  #   post:
+  # /users/{user_id}/posts/{post_id}/comments/{comment_id}:
+  #   delete:
+  # /users/{user_id}/follow:
+  #   post:
+  # /users/{user_id}/unfollow:
+  #   post:
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SignUpRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+        username:
+          type: string
+      required:
+        - email
+        - password
+        - username
+
+    SignUpResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+
+    SignInRequest:
+      type: object
+      properties:
+        credential:
+          description: User email or username
+          type: string
+        password:
+          type: string
+          format: password
+      required:
+        - credential
+        - password
+
+    SignInResponse:
+      type: object
+      properties:
+        token:
+          type: string
+
+    CreatePostRequest:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+
+    CreatePostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+        - id
+
+    RetrievePostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+      required:
+        - id
+        - title
