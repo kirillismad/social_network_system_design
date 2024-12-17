@@ -1,0 +1,16 @@
+@startuml context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Traveler")
+Person(admin, "Admin")
+
+System(system, "Traveler Social Network")
+
+System_Ext(cdn, "CDN")
+
+Rel(user, system, "Interract with travelers, posts, comments, etc.")
+Rel(user, cdn, "Get static and media")
+Rel(system, cdn, "Manage content")
+Rel(admin, system, "Manage locations")
+
+@enduml
