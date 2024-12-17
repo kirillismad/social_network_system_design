@@ -1,106 +1,117 @@
+import pprint
+
 dau = 10_000_000
 d = 86400
 
-# posts 
-# delete post
-post_item_size = 500 + 3 * 36 + 36 + 36
-images_in_post = 3
+# auth
+sign_up = dau / 365
 
-create_post = 3
+# posts
+create_post = 1
 delete_post = 1/30
-retrieve_post = 8
+retrieve_post = 10
 list_posts_by_user_id = 5
-
-create_posts_rps = dau * create_post / d
-delete_posts_rps = dau * delete_post / d
-retrieve_post_rps = dau * retrieve_post / d
-list_posts_by_user_id_rps = dau * list_posts_by_user_id / d
-
-create_like = 8
-delete_like = 2
-
-create_like_rps = dau * create_like / d
-delete_like_rps = dau * delete_like / d
-
-post_writes_rps = create_posts_rps + delete_posts_rps + create_like_rps + delete_like_rps
-post_reads_rps = retrieve_post_rps + list_posts_by_user_id_rps
-
-print("create_post_rps:", create_posts_rps)
-print("delete_posts_rps:", delete_posts_rps)
-print("retrieve_post_rps:", retrieve_post_rps)
-print("list_posts_by_user_id_rps:", list_posts_by_user_id_rps)
-
-print("create_like_rps:", create_like_rps)
-print("delete_like_rps:", delete_like_rps)
-
-print("post_writes_rps:", post_writes_rps)
-print("post_reads_rps:", post_reads_rps)
-
-
-# locations
-list_top_locations = 5
-list_top_locations_rps = list_top_locations * dau / d
-
-locations_read_rps = list_top_locations_rps + retrieve_post_rps
-
-print("list_top_locations_rps:", list_top_locations_rps)
-print("locations_read_rps:", locations_read_rps)
-
-# comments
-create_comment = 5
-delete_comment = 1
-
-create_comment_rps = dau * create_comment / d
-delete_comment_rps = dau * delete_comment / d
-
-comments_write_rps = create_comment_rps + delete_comment_rps
-comments_read_rps = retrieve_post_rps
-
-print("create_comment_rps:", create_comment_rps)
-print("delete_comment_rps:", delete_comment_rps)
-print("comments_write_rps:", comments_write_rps)
-print("comments_read_rps:", comments_read_rps)
+likes = 8
+dislikes = 2
+images_per_post = 3
+find_location_per_post = 5
 
 # feed
-feed = 13
-feed_rps = dau * feed / d
+list_feed = 13 # (20 items per page)
 
-feed_read_rps = feed_rps + 0
+# images
+images_upload = create_post * images_per_post
+images_download = retrieve_post * images_per_post + list_feed * 20
 
-print("feed_rps:", feed_rps)
-print("feed_read_rps:", feed_read_rps)
+# comments
+list_comments = retrieve_post * 2 # 2 pages
+create_comment = 3
+delete_comment = 1
 
-# images 
-images_max_bytes = 1 * 1024 * 1024
-upload_images_rps = create_posts_rps * images_in_post
-delete_images_rps = delete_posts_rps * images_in_post
+# follow
+follow = 2
+unfollow = 1
 
-images_read_rps = retrieve_post_rps + list_posts_by_user_id_rps + feed_rps
-images_write_rps = upload_images_rps + delete_images_rps
+# locations
+locations_with_posts = 5
+list_locations = create_post * find_location_per_post
 
-images_write_traffic = upload_images_rps * images_max_bytes
-images_read_traffic = images_read_rps * images_max_bytes
+def auth_metrics():
+    return {
+        "sign_up": sign_up / d,
+    }
 
-print("images_read_rps:", images_read_rps)
-print("images_write_rps:", images_write_rps)
-print("images_write_traffic:", images_write_traffic / 1024 / 1024)
-print("images_read_traffic:", images_read_traffic / 1024 / 1024)
+def post_metrics():
+    dct = {
+        "create_post": create_post * dau / d,
+        "delete_post": delete_post * dau / d,
+        "retrieve_post": retrieve_post * dau / d,
+        "list_posts_by_user_id": list_posts_by_user_id * dau / d,
+        "likes": likes * dau / d,
+        "dislikes": dislikes * dau / d,
+        "list_feed": list_feed * dau / d,
+    }
+    dct.update({
+        "post_writes": dct["create_post"] + dct["delete_post"] + dct["likes"] + dct["dislikes"],
+        "post_reads": dct["retrieve_post"] + dct["list_posts_by_user_id"] + dct["list_feed"],
+    })
+    return dct
 
-# follows
-create_follow = 2
-delete_follow = 1
+def images_metrics():
+    dct = {
+        "images_upload": images_upload * dau / d,
+        "images_download": images_download * dau / d,
+    }
+    return dct
 
-create_follow_rps = create_follow * dau / d
-delete_follow_rps = dau * delete_follow / d
+def comments_metrics():
+    dct = {
+        "create_comment": create_comment * dau / d,
+        "delete_comment": delete_comment * dau / d,
+        "list_comments": list_comments * dau / d,
+    }
+    dct.update({
+        "comments_writes": dct["create_comment"] + dct["delete_comment"],
+        "comments_reads": dct["list_comments"],
+    })
 
-follow_writes_rps = create_follow_rps + delete_follow_rps
+    return dct
 
-print("create_follow_rps:", create_follow_rps)
-print("delete_follow_rps:", delete_follow_rps)
-print("follow_writes_rps:", follow_writes_rps)
 
-total_write_rps = post_writes_rps + comments_write_rps + images_write_rps + follow_writes_rps
-total_read_rps = post_reads_rps + comments_read_rps + feed_read_rps + images_read_rps
+def follow_metrics():
+    return {
+        "follow": follow * dau / d,
+        "unfollow": unfollow * dau / d,
+    }
 
-print("total_write_rps:", total_write_rps)
-print("total_read_rps:", total_read_rps)
+def locations_metrics():
+    dct = {
+        "locations_with_posts": locations_with_posts * dau / d,
+        "list_locations": list_locations * dau / d,
+    }
+    dct.update({
+        "locations_reads": dct["list_locations"] + dct["locations_with_posts"],
+    })
+    return dct
+
+posts = post_metrics()
+images = images_metrics()
+comments = comments_metrics()
+follow = follow_metrics()
+locations = locations_metrics()
+auth = auth_metrics()
+
+total_read = posts["post_reads"] + images["images_download"] + comments["comments_reads"] + locations["locations_reads"]
+total_write = posts["post_writes"] + images["images_upload"] + comments["comments_writes"] + follow["follow"] + auth["sign_up"]
+
+f = pprint.pformat
+
+print("total_read:", f(total_read))
+print("total_write:", f(total_write))
+
+print("auth:", f(auth))
+print("posts:", f(posts))
+print("images:", f(images))
+print("comments:", f(comments))
+print("follow:", f(follow))
+print("locations:", f(locations))

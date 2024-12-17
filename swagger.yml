@@ -13,9 +13,23 @@ info:
 servers:
   - url: http://localhost:8000
     description: Local server
+tags:
+  - name: auth
+    description: Authentication
+  - name: posts
+    description: Posts
+  - name: comments
+    description: Comments
+  - name: social
+    description: Social
+  - name: locations
+    description: Locations
+
 paths:
   /sign-up:
     post:
+      tags:
+        - auth
       summary: Sign up
       requestBody:
         required: true
@@ -32,6 +46,8 @@ paths:
                 $ref: "#/components/schemas/SignUpResponse"
   /sign-in:
     post:
+      tags:
+        - auth
       summary: Sign in
       requestBody:
         required: true
@@ -48,108 +64,413 @@ paths:
                 $ref: "#/components/schemas/SignInResponse"
   /sign-out:
     post:
+      tags:
+        - auth
       security:
-        - bearerAuth: []
+        - cookieAuth: []
       summary: Sign out
       responses:
         "200":
           description: OK
-  # /users/{user_id}/posts:
-  #   get:
-  #     security:
-  #       - bearerAuth: []
-  #     summary: Get user posts
-  #     parameters:
-  #       - name: user_id
-  #         in: path
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       "200":
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: array
-  #               items:
-  #                 $ref: "#/components/schemas/CreatePostResponse"
 
-  # /users/{user_id}/posts/{post_id}:
-  #   get:
-  #     security:
-  #       - bearerAuth: []
-  #     summary: Get user post
-  #     parameters:
-  #       - name: user_id
-  #         in: path
-  #         required: true
-  #         schema:
-  #           type: string
-  #       - name: post_id
-  #         in: path
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       "200":
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: "#/components/schemas/RetrievePostResponse"
-  #   delete:
-  # /locations:
-  #   get:
-  # /locations/with-post-count:
-  #   get:
-  # /locations/{location_id}/posts:
-  #   get:
-  # /images/upload:
-  #   post:
-  #     summary: Upload image
-  #     requestBody:
-  #       required: true
-  #       content:
-  #         multipart/form-data:
-  #           schema:
-  #             type: object
-  #             properties:
-  #               image:
-  #                 type: string
-  #                 format: binary
-  #     responses:
-  #       "200":
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               properties:
-  #                 url:
-  #                   type: string
-  #               required:
-  #                 - url
-  # /users/{user_id}/posts/{post_id}/like:
-  #   post:
-  # /users/{user_id}/posts/{post_id}/dislike:
-  #   delete:
-  # /users/{user_id}/posts/{post_id}/comments:
-  #   get:
-  #   post:
-  # /users/{user_id}/posts/{post_id}/comments/{comment_id}:
-  #   delete:
-  # /users/{user_id}/follow:
-  #   post:
-  # /users/{user_id}/unfollow:
-  #   post:
+  /users/{user_id}/posts:
+    post:
+      tags:
+        - posts
+      security:
+        - cookieAuth: []
+      summary: Create user post
+      description: "Создание поста (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePostResponse"
+    get:
+      tags:
+        - posts
+      security:
+        - cookieAuth: []
+      summary: Get user posts
+      description: "Просмотр постов конкретного пользователя в обратном хронологическом порядке (limit: 2s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CreatePostResponse"
 
+  /users/{user_id}/posts/{post_id}:
+    get:
+      tags:
+        - posts
+      security:
+        - cookieAuth: []
+      summary: Get user post
+      description: "Просмотр поста (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetrievePostResponse"
+    delete:
+      tags:
+        - posts
+      security:
+        - cookieAuth: []
+      summary: Delete user post
+      description: "Удаление поста (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /locations/with-post-count:
+    get:
+      tags:
+        - locations
+      security:
+        - cookieAuth: []
+      summary: Get locations with post count
+      description: "Получить список локаций с совокупным кол-вом постов (limit: 2s)"
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListLocationsWithPostCountResponse"
+  /locations:
+    get:
+      tags:
+        - locations
+      security:
+        - cookieAuth: []
+      summary: Get locations
+      description: "Выбрать локацию из предзаполненного списка локаций (limit: 0.5s)"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListLocationsResponse"
+  /users/{user_id}/posts/{post_id}/like:
+    post:
+      tags:
+        - posts
+      security:
+        - cookieAuth: []
+      summary: Like user post
+      description: "Лайк поста (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /users/{user_id}/posts/{post_id}/dislike:
+    delete:
+      tags:
+        - posts
+      security:
+        - cookieAuth: []
+      summary: Dislike user post
+      description: "Дизлайк поста (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /users/{user_id}/posts/{post_id}/comments:
+    get:
+      tags:
+        - comments
+      security:
+        - cookieAuth: []
+      summary: Get user post comments
+      description: "Просмотр комментариев к посту (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ListCommentsResponse"
+    post:
+      tags:
+        - comments
+      security:
+        - cookieAuth: []
+      summary: Create user post comment
+      description: "Создание"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCommentResponse"
+
+  /users/{user_id}/posts/{post_id}/comments/{comment_id}:
+    delete:
+      tags:
+        - comments
+      security:
+        - cookieAuth: []
+      summary: Delete user post comment
+      description: "Удаление комментария (limit: 1s). Может удалять только автор комментария или автор поста"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /users/{user_id}/follow:
+    post:
+      tags:
+        - social
+      security:
+        - cookieAuth: []
+      summary: Follow user
+      description: "Подписка на пользователя (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /users/{user_id}/unfollow:
+    delete:
+      tags:
+        - social
+      security:
+        - cookieAuth: []
+      summary: Unfollow user
+      description: "Отписка от пользователя (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /users/{user_id}/posts/{post_id}/images:
+    post:
+      tags:
+        - posts
+      security:
+        - cookieAuth: []
+      summary: Upload user image
+      description: "Загрузка изображения (limit: 1s)"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  url:
+                    type: string
+                required:
+                  - id
+                  - url
+  /users/{user_id}/feed:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get user feed
+      description: "Получение ленты постов подписанных пользователей (limit: 2s)"
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListUserFeedResponse"
 components:
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
 
   schemas:
     SignUpRequest:
@@ -199,8 +520,15 @@ components:
       properties:
         title:
           type: string
+        images:
+          type: array
+          items:
+            type: string
+        location_id:
+          type: string
       required:
         - title
+        - images
 
     CreatePostResponse:
       type: object
@@ -220,3 +548,115 @@ components:
       required:
         - id
         - title
+
+    ListLocationsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+        required:
+          - id
+          - name
+
+    ListCommentsResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              user_id:
+                type: string
+              text:
+                type: string
+            required:
+              - id
+              - user_id
+              - text
+    CreateCommentRequest:
+      type: object
+      properties:
+        text:
+          type: string
+      required:
+        - text
+    CreateCommentResponse:
+      type: object
+      properties:
+        text:
+          type: string
+    ListUserFeedResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              title:
+                type: string
+              images:
+                type: array
+                items:
+                  type: string
+              user_id:
+                type: string
+              location_id:
+                type: string
+              likes:
+                type: integer
+              comments_count:
+                type: integer
+            required:
+              - id
+              - title
+              - images
+              - user_id
+              - location_id
+              - likes
+              - comments_count
+
+    ListLocationsWithPostCountResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              post_count:
+                type: integer
+              top_post:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  title:
+                    type: string
+                  images:
+                    type: array
+                    items:
+                      type: string
+            required:
+              - id
+              - name
+              - post_count
