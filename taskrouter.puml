@@ -1,0 +1,37 @@
+@startuml container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+System_Ext(sd, "Service Desk")
+System_Ext(users, "Users")
+
+System_Boundary(taskrouter, "Task Router") {
+    ContainerQueue(req, "request", "kafka")
+    ContainerQueue(resp, "response", "kafka")
+    ContainerQueue(sync, "sync", "kafka")
+    Container(router, "router", "golang")
+    ContainerDb(cache, "user cache", "Redis")
+    ContainerDb(db, "db", "Postgres")
+    ContainerQueue(inner, "inner_q", "rabbit_mq")
+}
+
+Rel(router, db, "manager info")
+Rel(router, cache, "cache", "http")
+Rel_R(router, users, "get users", gRPC)
+Rel_L(router, inner, "pull/push")
+Rel(sd, req, "push")
+Rel(sd, resp, "pull")
+Rel(sd, sync, "push")
+Rel_U(router, req, "pull")
+Rel_U(router, resp, "push")
+Rel_U(router, sync, "pull")
+
+@enduml
+
+Необходимо расчитать:
+количество менеджеров = 5000
+обработка чатов = 60 в час
+5000 * 60 = 300000
+
+какое максимальное количество чатов может быть обработано за час?
+
+2 * 300000 / 60 / 60 = 166.67

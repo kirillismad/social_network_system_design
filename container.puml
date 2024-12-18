@@ -6,7 +6,7 @@ Container(lb, "Load Balancer", "HTTPS, round-robin")
 
 System_Boundary(system, "Traveler Social Network") {
     Container(webapp, "Web UI")
-    Container(gateway, "Gateway", "go", "Auth, Rate limit, proxy etc.")
+    Container(gateway, "Gateway", "go", "Auth, Rate limit, cache, proxy etc.")
     ContainerDb(gateway_db, "TokenBucket", "Redis")
     Container(auth, "Auth", "go", "session-based")
     ContainerDb(auth_db, "Auth DB", "Redis")
