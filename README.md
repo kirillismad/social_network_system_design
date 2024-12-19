@@ -46,28 +46,38 @@
 
 Целевая availability = 99.95%, тогда при mttr = 1h, mtbt = 83d
 
+```
 total_read: 40277.77777777779
 total_write: 2318.9899374260103
-auth: {'sign_up': 0.31709791983764585}
-posts: {'create_post': 115.74074074074075,
- 'delete_post': 3.8580246913580245,
- 'dislikes': 231.4814814814815,
- 'likes': 925.925925925926,
- 'list_feed': 1504.6296296296296,
- 'list_posts_by_user_id': 578.7037037037037,
- 'post_reads': 3240.740740740741,
- 'post_writes': 1277.0061728395062,
- 'retrieve_post': 1157.4074074074074}
-images: {'images_download': 33564.81481481482, 'images_upload': 347.22222222222223}
-comments: {'comments_reads': 2314.814814814815,
- 'comments_writes': 462.962962962963,
- 'create_comment': 347.22222222222223,
- 'delete_comment': 115.74074074074075,
- 'list_comments': 2314.814814814815}
-follow: {'follow': 231.4814814814815, 'unfollow': 115.74074074074075}
-locations: {'list_locations': 578.7037037037037,
- 'locations_reads': 1157.4074074074074,
- 'locations_with_posts': 578.7037037037037}
+auth:
+	sign_up: 0.32
+posts:
+	create_post: 115.74
+	delete_post: 3.86
+	retrieve_post: 1157.41
+	list_posts_by_user_id: 578.70
+	likes: 925.93
+	dislikes: 231.48
+	list_feed: 1504.63
+	post_writes: 1277.01
+	post_reads: 3240.74
+images:
+	images_upload: 347.22
+	images_download: 33564.81
+comments:
+	create_comment: 347.22
+	delete_comment: 115.74
+	list_comments: 2314.81
+	comments_writes: 462.96
+	comments_reads: 2314.81
+follow:
+	follow: 231.48
+	unfollow: 115.74
+locations:
+	locations_with_posts: 578.70
+	list_locations: 578.70
+	locations_reads: 1157.41
+```
 
  # c4-plantuml
 

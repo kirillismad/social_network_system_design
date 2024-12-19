@@ -1,5 +1,3 @@
-import pprint
-
 dau = 10_000_000
 d = 86400
 
@@ -104,14 +102,19 @@ auth = auth_metrics()
 total_read = posts["post_reads"] + images["images_download"] + comments["comments_reads"] + locations["locations_reads"]
 total_write = posts["post_writes"] + images["images_upload"] + comments["comments_writes"] + follow["follow"] + auth["sign_up"]
 
-f = pprint.pformat
+r = {
 
-print("total_read:", f(total_read))
-print("total_write:", f(total_write))
+    "auth": auth,
+    "posts": posts,
+    "images": images,
+    "comments": comments,
+    "follow": follow,
+    "locations": locations,
+}
+print("total_read:", total_read)
+print("total_write:", total_write)
 
-print("auth:", f(auth))
-print("posts:", f(posts))
-print("images:", f(images))
-print("comments:", f(comments))
-print("follow:", f(follow))
-print("locations:", f(locations))
+for k, v in r.items():
+    print(f"{k}:")
+    for kk, vv in v.items():
+        print(f"\t{kk}: {vv:.2f}")
