@@ -1,0 +1,34 @@
+@startuml signup
+
+|G| Gateway
+
+|U| Users
+
+|A| Auth
+
+|G| 
+start
+:/sign-up;
+
+:users.create_user();
+
+|U|
+:create_if_not_exist();
+
+|G|
+if (already exist?) then (yes)
+    |G|
+    :error;
+    
+else (no)
+    |G|
+    :auth.create_session();
+    |A|
+    :create session; 
+endif
+
+|G|
+:set_auth_cookie();
+
+stop
+@enduml

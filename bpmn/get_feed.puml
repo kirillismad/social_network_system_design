@@ -1,0 +1,33 @@
+@startuml signup
+
+|G| Gateway
+
+|F| Feed
+
+|G| 
+start
+:/users/{user_id}/feed?page_size={page_size}&last_id={last_id};
+:auth_user_id = auth.auth(cookie);
+
+|G|
+if (auth_user_id == user_id) then (no)
+    :premission_denied;
+    stop;
+else (yes)
+    :feed = feed.get_feed(user_id, page_size, last_id);
+    
+    |F|
+    :feed = db.posts.find(user_id, page_size, last_id);
+    if (len(feed) < page_size) then (yes)
+        |F|
+        :followees = followers.get_followees(user_id);
+        :additional = posts.get_posts_by_user_ids(followees, page_size - len(posts), last_id);
+        :db.posts.insert(additional);
+        :feed = feed + additional;
+    endif
+endif
+|G|
+:return feed;
+stop
+@enduml
+

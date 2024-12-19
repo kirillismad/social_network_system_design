@@ -448,16 +448,16 @@ paths:
       summary: Get user feed
       description: "Получение ленты постов подписанных пользователей (limit: 2s)"
       parameters:
-        - name: limit
+        - name: page_size
           in: query
           required: false
           schema:
             type: integer
-        - name: offset
+        - name: last_id
           in: query
           required: false
           schema:
-            type: integer
+            type: string
       responses:
         "200":
           description: OK
