@@ -68,3 +68,9 @@ follow: {'follow': 231.4814814814815, 'unfollow': 115.74074074074075}
 locations: {'list_locations': 578.7037037037037,
  'locations_reads': 1157.4074074074074,
  'locations_with_posts': 578.7037037037037}
+
+ # c4-plantuml
+
+ <p align="center">
+  <img src="out/container/container.svg" />
+</p>
